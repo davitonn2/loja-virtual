@@ -30,3 +30,138 @@ const products = [
     { id: 29, name: "Teclado Mecânico", category: "Eletrônicos", stock: 8, price: 89.99, image: "img/teclado.jpg" },
     { id: 30, name: "Caixa de Som Bluetooth", category: "Eletrônicos", stock: 6, price: 59.99, image: "img/caixaDeSom.jpg" },
 ];
+
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+function mostrarProdutos(filteredProducts) {
+    const productsDiv = document.getElementById('products');
+    productsDiv.innerHTML = '';
+    filteredProducts.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'card bg-white p-4 rounded-lg shadow-md';
+        card.innerHTML = `
+            <img src="${product.image || `https://via.placeholder.com/150?text=${product.name}`}" alt="${product.name}" class="w-full h-48 object-cover rounded-t-md">
+            <h3 class="text-lg font-bold mt-2">${product.name}</h3>
+            <p class="text-gray-600">Categoria: ${product.category}</p>
+            <p class="text-gray-600">Estoque: ${product.stock}</p>
+            <p class="text-green-600 font-bold">R$${product.price.toFixed(2)}</p>
+            <button class="bg-blue-600 text-white px-4 py-2 mt-2 rounded ${product.stock === 0 ? 'opacity-50 cursor-not-allowed' : ''}" 
+                ${product.stock === 0 ? 'disabled' : ''} 
+                onclick="addToCart(${product.id})">Adicionar ao Carrinho</button>
+        `;
+        productsDiv.appendChild(card);
+    });
+}
+
+function adicionarAoCarrinho(productId) {
+    const product = products.find(p => p.id === productId);
+    if (product.stock === 0) {
+        alert('Produto sem estoque!');
+        return;
+    }
+    const cartItem = cart.find(item => item.id === productId);
+    if (cartItem) {
+        if (cartItem.quantity < product.stock) {
+            cartItem.quantity++;
+        } else {
+            alert('Quantidade máxima em estoque atingida!');
+            return;
+        }
+    } else {
+        cart.push({ id: productId, name: product.name, price: product.price, quantity: 1 });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    updateCartModal();
+}
+
+function updateCartCount() {
+    const cartCount = document.getElementById('cart-count');
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.textContent = totalItems;
+}
+
+function updateCartModal() {
+    const cartItemsDiv = document.getElementById('cart-items');
+    cartItemsDiv.innerHTML = '';
+    if (cart.length === 0) {
+        cartItemsDiv.innerHTML = '<p>Carrinho vazio</p>';
+        return;
+    }
+    cart.forEach(item => {
+        const product = products.find(p => p.id === item.id);
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'flex justify-between items-center mb-2';
+        itemDiv.innerHTML = `
+            <p>${item.name} - ${item.quantity}x R$${item.price.toFixed(2)}</p>
+            <button class="bg-red-600 text-white px-2 py-1 rounded" onclick="removeFromCart(${item.id})">Remover</button>
+        `;
+        cartItemsDiv.appendChild(itemDiv);
+    });
+}
+
+function removerDoCarrinho(productId) {
+    const cartItemIndex = cart.findIndex(item => item.id === productId);
+    if (cartItemIndex !== -1) {
+        if (cart[cartItemIndex].quantity > 1) {
+            cart[cartItemIndex].quantity--;
+        } else {
+            cart.splice(cartItemIndex, 1);
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        updateCartModal();
+    }
+}
+
+function finalizarCompra() {
+    if (cart.length === 0) {
+        alert('Carrinho vazio!');
+        return;
+    }
+    alert('Compra finalizada com sucesso!');
+    cart = [];
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    updateCartModal();
+    document.getElementById('cart-modal').classList.add('hidden');
+}
+
+function procurarProdutos(term) {
+    term = term.toLowerCase();
+    return products.filter(product => 
+        product.name.toLowerCase().includes(term) || 
+        product.category.toLowerCase().includes(term)
+    );
+}
+
+
+document.getElementById('cart-btn').addEventListener('click', () => {
+    document.getElementById('cart-modal').classList.toggle('hidden');
+    updateCartModal();
+});
+
+document.getElementById('close-cart').addEventListener('click', () => {
+    document.getElementById('cart-modal').classList.add('hidden');
+});
+
+document.getElementById('checkout-btn').addEventListener('click', finalizarCompra);
+
+document.getElementById('search-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const searchTerm = document.getElementById('search-input').value;
+    const filteredProducts = searchProducts(searchTerm);
+    displayProducts(filteredProducts);
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('cat');
+    if (category) {
+        displayProducts(products.filter(p => p.category === category));
+    } else {
+        displayProducts(products);
+    }
+    updateCartCount();
+});
