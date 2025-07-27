@@ -33,7 +33,7 @@ const products = [
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-function mostrarProdutos(filteredProducts) {
+function displayProducts(filteredProducts) {
     const productsDiv = document.getElementById('products');
     productsDiv.innerHTML = '';
     filteredProducts.forEach(product => {
@@ -53,7 +53,7 @@ function mostrarProdutos(filteredProducts) {
     });
 }
 
-function adicionarAoCarrinho(productId) {
+function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     if (product.stock === 0) {
         alert('Produto sem estoque!');
@@ -100,7 +100,7 @@ function updateCartModal() {
     });
 }
 
-function removerDoCarrinho(productId) {
+function removeFromCart(productId) {
     const cartItemIndex = cart.findIndex(item => item.id === productId);
     if (cartItemIndex !== -1) {
         if (cart[cartItemIndex].quantity > 1) {
@@ -114,7 +114,7 @@ function removerDoCarrinho(productId) {
     }
 }
 
-function finalizarCompra() {
+function checkout() {
     if (cart.length === 0) {
         alert('Carrinho vazio!');
         return;
@@ -127,7 +127,7 @@ function finalizarCompra() {
     document.getElementById('cart-modal').classList.add('hidden');
 }
 
-function procurarProdutos(term) {
+function searchProducts(term) {
     term = term.toLowerCase();
     return products.filter(product => 
         product.name.toLowerCase().includes(term) || 
@@ -135,7 +135,7 @@ function procurarProdutos(term) {
     );
 }
 
-
+// Event Listeners
 document.getElementById('cart-btn').addEventListener('click', () => {
     document.getElementById('cart-modal').classList.toggle('hidden');
     updateCartModal();
@@ -145,7 +145,7 @@ document.getElementById('close-cart').addEventListener('click', () => {
     document.getElementById('cart-modal').classList.add('hidden');
 });
 
-document.getElementById('checkout-btn').addEventListener('click', finalizarCompra);
+document.getElementById('checkout-btn').addEventListener('click', checkout);
 
 document.getElementById('search-form').addEventListener('submit', (e) => {
     e.preventDefault();
