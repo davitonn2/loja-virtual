@@ -119,12 +119,27 @@ function checkout() {
         alert('Carrinho vazio!');
         return;
     }
+    // Reduz o estoque dos produtos no carrinho
+    cart.forEach(item => {
+        const product = products.find(p => p.id === item.id);
+        if (product) {
+            product.stock -= item.quantity;
+        }
+    });
     alert('Compra finalizada com sucesso!');
     cart = [];
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartCount();
     updateCartModal();
     document.getElementById('cart-modal').classList.add('hidden');
+    // Atualiza a exibição dos produtos para refletir o novo estoque
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('cat');
+    if (category) {
+        displayProducts(products.filter(p => p.category === category));
+    } else {
+        displayProducts(products);
+    }
 }
 
 function searchProducts(term) {
@@ -153,7 +168,6 @@ document.getElementById('search-form').addEventListener('submit', (e) => {
     const filteredProducts = searchProducts(searchTerm);
     displayProducts(filteredProducts);
 });
-
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
