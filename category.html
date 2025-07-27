@@ -1,11 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loja Virtual - Categoria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .cart-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            background-color: red;
+            color: white;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: bold;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+        }
+        .card {
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+    </style>
 </head>
-<body>
-    
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white p-4 sticky top-0 z-10 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="img/logo.avif" alt="Logo" class="h-12 mr-4">
+                <h1 class="text-2xl font-bold">Loja Virtual</h1>
+            </div>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="index.html" class="hover:underline">Todos os Produtos</a></li>
+                    <li><a href="category.html?cat=Eletrônicos" class="hover:underline">Eletrônicos</a></li>
+                    <li><a href="category.html?cat=Roupas" class="hover:underline">Roupas</a></li>
+                    <li><a href="category.html?cat=Acessórios" class="hover:underline">Acessórios</a></li>
+                </ul>
+            </nav>
+            <form id="search-form" class="flex">
+                <input type="text" id="search-input" placeholder="Pesquisar produtos..." class="p-2 rounded-l-md text-black">
+                <button type="submit" class="bg-blue-800 p-2 rounded-r-md">🔍</button>
+            </form>
+            <div class="relative">
+                <button id="cart-btn" class="bg-green-500 px-4 py-2 rounded">Carrinho</button>
+                <span id="cart-count" class="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteudo Principal -->
+    <main class="container mx-auto p-4">
+        <div id="products" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+    </main>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-4">Carrinho de Compras</h2>
+            <div id="cart-items"></div>
+            <div class="mt-4 flex justify-between">
+                <button id="close-cart" class="bg-gray-500 text-white px-4 py-2 rounded">Fechar</button>
+                <button id="checkout-btn" class="bg-blue-600 text-white px-4 py-2 rounded">Finalizar Compra</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
